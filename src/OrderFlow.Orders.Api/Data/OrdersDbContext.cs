@@ -19,6 +19,10 @@ public class OrdersDbContext : DbContext
             entity.Property(o => o.Status)
                   .HasConversion<string>()
                   .HasMaxLength(20);
+	    entity.Property(o => o.CreatedAtUtc)
+                  .HasConversion(
+                      v => v,
+                      v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
         });
     }
 }
