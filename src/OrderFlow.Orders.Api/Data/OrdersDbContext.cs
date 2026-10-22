@@ -24,5 +24,6 @@ public class OrdersDbContext : DbContext
                       v => v,
                       v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
         });
+        
     }
 }

@@ -16,4 +16,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.20" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\OrderFlow.Contracts\OrderFlow.Contracts.csproj" />
+  </ItemGroup>
+
 </Project>
