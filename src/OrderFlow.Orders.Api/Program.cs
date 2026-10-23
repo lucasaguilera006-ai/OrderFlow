@@ -1,8 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using OrderFlow.Orders.Api.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMq"));
+builder.Services.AddSingleton<IOrderEventPublisher, RabbitMqOrderEventPublisher>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
