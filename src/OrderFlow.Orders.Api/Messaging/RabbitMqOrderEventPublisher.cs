@@ -19,7 +19,7 @@ public sealed class RabbitMqOrderEventPublisher(IOptions<RabbitMqOptions> option
     {
         var connection = await GetConnectionAsync(ct);
 
-        await using var channel = await _connection.CreateChannelAsync(cancellationToken: ct);
+        await using var channel = await connection.CreateChannelAsync(cancellationToken: ct);
 
         await channel.ExchangeDeclareAsync(
             ExchangeName, ExchangeType.Topic, durable: true, cancellationToken: ct);
@@ -30,7 +30,6 @@ public sealed class RabbitMqOrderEventPublisher(IOptions<RabbitMqOptions> option
             Persistent = true,
             ContentType = "application/json",
         };
-        props.Persistent = true;
 
         await channel.BasicPublishAsync(
             ExchangeName, OrderCreatedRoutingKey,
