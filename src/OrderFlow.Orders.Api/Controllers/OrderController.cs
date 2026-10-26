@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using OrderFlow.Contracts;
 using OrderFlow.Orders.Api.Data;
 using OrderFlow.Orders.Api.Domain;
+using OrderFlow.Orders.Api.Messaging;
 
 namespace OrderFlow.Orders.Api.Controllers;
 
@@ -9,10 +11,12 @@ namespace OrderFlow.Orders.Api.Controllers;
 public class OrdersController : ControllerBase
 {
     private readonly OrdersDbContext _db;
+    private readonly IOrderEventPublisher _publisher;
 
-    public OrdersController(OrdersDbContext db)
+    public OrdersController(OrdersDbContext db, IOrderEventPublisher publisher)
     {
         _db = db;
+        _publisher = publisher;
     }
 
     [HttpPost]
@@ -32,6 +36,9 @@ public class OrdersController : ControllerBase
 
         _db.Orders.Add(order);
         await _db.SaveChangesAsync();
+
+        await _publisher.PublishOrderCreatedAsync(
+            new OrderCreated(order.Id, order.ProductId, order.Quantity, order.CreatedAtUtc));
 
         return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
     }
