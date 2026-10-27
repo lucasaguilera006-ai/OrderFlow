@@ -11,6 +11,7 @@ namespace OrderFlow.Inventory.Api.Messaging;
 public sealed class OrderCreatedConsumer(
     IOptions<RabbitMqOptions> options,
     IServiceScopeFactory scopeFactory,
+    IStockEventPublisher publisher,
     ILogger<OrderCreatedConsumer> logger) : BackgroundService
 {
     private const string ExchangeName = "orderflow.events";
@@ -88,12 +89,21 @@ public sealed class OrderCreatedConsumer(
                 ct);
 
         if (updated == 1)
+        {
             logger.LogInformation(
                 "Stock deducted: order {OrderId}, product {ProductId}, quantity {Quantity}",
                 message.OrderId, message.ProductId, message.Quantity);
+
+            await publisher.PublishStockReservedAsync(new StockReserved(message.OrderId), ct);
+        }
         else
+        {
             logger.LogWarning(
                 "Could not reserve stock: order {OrderId}, product {ProductId} does not exist or has insufficient stock for quantity {Quantity}",
                 message.OrderId, message.ProductId, message.Quantity);
+
+            await publisher.PublishStockRejectedAsync(
+                new StockRejected(message.OrderId, "Product not found or insufficient stock"), ct);
+        }
     }
 }

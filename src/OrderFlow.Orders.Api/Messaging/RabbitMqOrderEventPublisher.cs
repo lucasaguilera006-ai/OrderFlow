@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 
 namespace OrderFlow.Orders.Api.Messaging;
 
-public sealed class RabbitMqOrderEventPublisher(IOptions<RabbitMqOptions> options) 
+public sealed class RabbitMqOrderEventPublisher(IOptions<RabbitMqOptions> options)
 : IOrderEventPublisher, IAsyncDisposable
 {
     public const string ExchangeName = "orderflow.events";
@@ -33,17 +33,17 @@ public sealed class RabbitMqOrderEventPublisher(IOptions<RabbitMqOptions> option
 
         await channel.BasicPublishAsync(
             ExchangeName, OrderCreatedRoutingKey,
-            mandatory: false, basicProperties: props, body: body, 
+            mandatory: false, basicProperties: props, body: body,
             cancellationToken: ct);
     }
     private async Task<IConnection> GetConnectionAsync(CancellationToken ct)
     {
-        if (_connection is {IsOpen: true }) return _connection;
+        if (_connection is { IsOpen: true }) return _connection;
 
         await _lock.WaitAsync(ct);
         try
         {
-            if (_connection is {IsOpen: true }) return _connection;
+            if (_connection is { IsOpen: true }) return _connection;
 
             var factory = new ConnectionFactory
             {
@@ -65,6 +65,6 @@ public sealed class RabbitMqOrderEventPublisher(IOptions<RabbitMqOptions> option
     {
         if (_connection is not null) await _connection.DisposeAsync();
         _lock.Dispose();
-        
+
     }
 }

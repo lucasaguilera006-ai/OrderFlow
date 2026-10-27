@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<InventoryDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("InventoryDb")));
 builder.Services.AddHostedService<OrderCreatedConsumer>();
+builder.Services.AddSingleton<IStockEventPublisher, RabbitMqStockEventPublisher>();
 builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMq"));
 // Add services to the container.
 
