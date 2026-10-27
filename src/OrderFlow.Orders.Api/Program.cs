@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMq"));
 builder.Services.AddSingleton<IOrderEventPublisher, RabbitMqOrderEventPublisher>();
+builder.Services.AddHostedService<StockResultsConsumer>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
